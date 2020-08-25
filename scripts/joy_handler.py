@@ -44,6 +44,8 @@ class JoyHandler(object):
         self.min_gripper_states = [0.0]  # in arm driver measure units
         self.current_slider1 = 0
         self.current_slider2 = 0
+        self.last_btn3 = 0
+        self.last_btn4 = 0
         self.gripper_updated = False
         self.arm_updated = False
         self.gripper_pub = rospy.Publisher("/gripper/move_jp", JointState, queue_size=1)
@@ -114,7 +116,7 @@ class JoyHandler(object):
 
     def joints_callback(self, data):
 
-        if data.btn2 == 1:
+        if data.btn2 == 1 :
             # TODO debounce
             # btn3 moves current joint to +1
             self.selected_joint = 0
@@ -125,27 +127,31 @@ class JoyHandler(object):
             self.arm_updated = True
 
         # check buttons 3 and 4 to choose correct joint
-        if data.btn3 == 1:
-            # TODO debounce
-            # btn3 moves current joint to +1
-            if self.selected_joint == self.joints_number - 1:
-                rospy.loginfo("cannot increase joint, it is already {}".format(
-                    self.selected_joint))
-            else:
-                rospy.loginfo("joint number {} selected".format(
-                    self.selected_joint))
-                self.selected_joint += 1
+        if data.btn3 != self.last_btn3:
+            self.last_btn3 = data.btn3
+            if data.btn3 == 1:
+                # TODO debounce
+                # btn3 moves current joint to +1
+                if self.selected_joint == self.joints_number - 1:
+                    rospy.loginfo("cannot increase joint, it is already {}".format(
+                        self.selected_joint))
+                else:
+                    rospy.loginfo("joint number {} selected".format(
+                        self.selected_joint))
+                    self.selected_joint += 1
 
-        if data.btn4 == 1:
-            # TODO debounce
-            # btn4 moves current joint to -1
-            if self.selected_joint == 0:
-                rospy.loginfo("cannot decrease joint, it is already {}".format(
-                    self.selected_joint))
-            else:
-                rospy.loginfo("joint number {} selected".format(
-                    self.selected_joint))
-                self.selected_joint -= 1
+        if data.btn4 != self.last_btn4:
+            self.last_btn4 = data.btn4
+            if data.btn4 == 1:
+                # TODO debounce
+                # btn4 moves current joint to -1
+                if self.selected_joint == 0:
+                    rospy.loginfo("cannot decrease joint, it is already {}".format(
+                        self.selected_joint))
+                else:
+                    rospy.loginfo("joint number {} selected".format(
+                        self.selected_joint))
+                    self.selected_joint -= 1
 
 
 
