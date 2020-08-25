@@ -151,7 +151,7 @@ class JoyHandler(object):
 
 
         # check sliders 1 and 2 to move gripper and selected joint
-        if abs(data.left_x) > self.slider_delta:
+        if abs(data.slider1 - self.current_slider1) > self.slider_delta:
 
             rospy.logdebug("slider1: {} gripper_states: {}".format(data.slider1, self.current_gripper_states[0]))
             # it means that slider moves really
