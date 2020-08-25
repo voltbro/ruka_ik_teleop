@@ -136,9 +136,10 @@ class JoyHandler(object):
                     rospy.loginfo("cannot increase joint, it is already {}".format(
                         self.selected_joint))
                 else:
+                    self.selected_joint += 1
                     rospy.loginfo("joint number {} selected".format(
                         self.selected_joint))
-                    self.selected_joint += 1
+
 
         if data.btn4 != self.last_btn4:
             self.last_btn4 = data.btn4
@@ -149,9 +150,10 @@ class JoyHandler(object):
                     rospy.loginfo("cannot decrease joint, it is already {}".format(
                         self.selected_joint))
                 else:
+                    self.selected_joint -= 1
                     rospy.loginfo("joint number {} selected".format(
                         self.selected_joint))
-                    self.selected_joint -= 1
+
 
 
 
