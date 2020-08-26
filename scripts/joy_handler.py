@@ -39,7 +39,9 @@ class JoyHandler(object):
 
         self.current_gripper_states = [0.0]
         self.selected_joint = 0
-        self.slider_delta = 10  # in slider measure units
+        self.slider_delta = 7  # in slider measure units
+        self.slider_max = 1023
+        self.slider_min = 0
         self.max_gripper_states = [1.6] # in arm driver measure units
         self.min_gripper_states = [0.0]  # in arm driver measure units
         self.current_slider1 = 0
@@ -74,6 +76,17 @@ class JoyHandler(object):
         rospy.logdebug("joy_handler : end of init")
         rospy.Timer(rospy.Duration(0.05), self.send_data_to_arm)
         self.run()
+
+    def transformer(self, joy_value, min_r, max_r, min_joy, max_joy):
+        # function to transform value from slider or joystick to
+        # to real values and send them to /arm or /gripper
+        # like we got value 760 from slider [0, 1023]
+        # and r_value in [-1.6, 1.6]
+        # what r_value corresponds to 760 value of slider?
+
+        abs_value = (float(joy_value) / abs(max_joy - min_joy)) * abs(max_r - min_r)
+        value = abs_value + min_r
+        return value
 
     def send_data_to_arm(self, event):
         # TODO mb we need to add locks for arrays? check  it
@@ -140,7 +153,6 @@ class JoyHandler(object):
                     rospy.loginfo("joint number {} selected".format(
                         self.selected_joint))
 
-
         if data.btn4 != self.last_btn4:
             self.last_btn4 = data.btn4
             if data.btn4 == 1:
@@ -154,21 +166,24 @@ class JoyHandler(object):
                     rospy.loginfo("joint number {} selected".format(
                         self.selected_joint))
 
-
-
-
-
         # check sliders 1 and 2 to move gripper and selected joint
         if abs(data.slider1 - self.current_slider1) > self.slider_delta:
 
             rospy.logdebug("slider1: {} gripper_states: {}".format(data.slider1, self.current_gripper_states[0]))
             # it means that slider moves really
             self.current_slider1 = data.slider1
-            self.current_gripper_states[0] = (float(data.slider1) / 1024.0) * self.max_gripper_states[0]
+            # self.current_gripper_states[0] = (float(data.slider1) / 1024.0) * self.max_gripper_states[0]
+
+            self.current_gripper_states[0] = self.transformer(
+                joy_value=data.slider2,
+                min_r=self.min_gripper_states[0],
+                max_r=self.max_gripper_states[0],
+                min_joy=self.slider_min,
+                max_joy=self.slider_max
+            )
 
             rospy.loginfo("gripper moved to {}".format(self.current_gripper_states[0]))
             self.gripper_updated = True
-
 
 
         if abs(data.slider2 - self.current_slider2) > self.slider_delta:
@@ -177,16 +192,20 @@ class JoyHandler(object):
                                                                    self.current_joint_states[self.selected_joint]))
 
             # it means that slider moves really
-            self.current_joint_states[self.selected_joint] = (float(data.slider2) / 1024.0)\
-                                                             * self.max_joint_states[self.selected_joint]
+            # self.current_joint_states[self.selected_joint] = (float(data.slider2) / 1024.0)\
+            #                                                  * self.max_joint_states[self.selected_joint]
+            self.current_joint_states[self.selected_joint] = self.transformer(
+                joy_value=data.slider2,
+                min_r=self.min_joint_states[self.selected_joint],
+                max_r=self.max_joint_states[self.selected_joint],
+                min_joy=self.slider_min,
+                max_joy=self.slider_max
+            )
 
             rospy.loginfo("joint number {} moved to {}".format(self.selected_joint,
                                                                self.current_joint_states[self.selected_joint]))
 
-
             self.arm_updated = True
-
-        pass
 
     def ik_eef_callback(self, data):
         pass
