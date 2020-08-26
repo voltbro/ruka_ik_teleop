@@ -1,4 +1,34 @@
-###how to create turtlebot with lewansoul_xarm
+## how to use package
+
+#### on turtlebot:
+connect xarm, then
+```
+sudo chmod 777 /dev/hidraw0
+rosrun lewansoul_xarm xArm-ros.py
+```
+you must see smth like this:
+```
+pi@turtlebro18:~ $ rosrun lewansoul_xarm xArm-ros.py 
+HIDDevice:
+    /dev/hidraw0 | 483:5750 | MyUSB_HID | LOBOT | 49795F663732
+    release_number: 513
+    usage_page: 29808
+    usage: 452
+    interface_number: 0
+connected to xArm controller serial number: 49795F663732
+
+```
+
+##### on pc:
+connect joystick, then
+```
+export ROS_MASTER_URI=http://turtlebroXX.local:11311/
+roslaunch ruka_ik_teleop joy_joints.launch
+```
+
+
+
+## how to create turtlebot with lewansoul_xarm
 
 
 ``` 
@@ -44,6 +74,10 @@ sudo cp -r ~/ros_catkin_ws/src/lewansoul-xarm/config /opt/ros/melodic/share/lewa
 sudo cp -r ~/ros_catkin_ws/src/lewansoul-xarm/urdf /opt/ros/melodic/share/lewansoul_xarm/urdf/
 ```
 ```
+sudo chmod -R 777 /opt/ros/melodic/share/lewansoul_xarm/config/
+```
+
+```
 rosrun lewansoul_xarm xArm-ros.py
 ```
 
@@ -51,7 +85,4 @@ there is conflict between current ros on tb and arm node
 we have to kill it by systemctl 
 ```
 sudo systemctl stop turtlebro
-```
-```
-sudo chmod -R 777 /opt/ros/melodic/share/lewansoul_xarm/config/
 ```
