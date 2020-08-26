@@ -175,7 +175,7 @@ class JoyHandler(object):
             # self.current_gripper_states[0] = (float(data.slider1) / 1024.0) * self.max_gripper_states[0]
 
             self.current_gripper_states[0] = self.transformer(
-                joy_value=data.slider2,
+                joy_value=data.slider1,
                 min_r=self.min_gripper_states[0],
                 max_r=self.max_gripper_states[0],
                 min_joy=self.slider_min,
